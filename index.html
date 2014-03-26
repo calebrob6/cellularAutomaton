@@ -84,10 +84,11 @@
 		var context;
 		
 		var running = false;
+		var step = false;
 		var currentFrame = 0;
 		
-		var height = 600;
-		var width = 600;
+		var height = 200;
+		var width = 200;
 
 		var newState = 0;
 		
@@ -124,7 +125,7 @@
 		function gameLoop(){
 		
 			if(running){
-			
+				var start = +new Date();
 				
 			
 				currentState = context.getImageData(0, 0, width, height).data;
@@ -133,7 +134,7 @@
 				context.clearRect(0,0,width, height);
 			
 				//update
-				
+				var start1 = +new Date(); 
 				for(var i=0;i<height;i+=2){
 					for(var j=0;j<width;j+=2){
 						var x = j+currentOffset;
@@ -170,6 +171,8 @@
 						
 					}
 				}
+				var end1 =  +new Date();
+				var diff1 = end1 - start1;
 				
 				context.putImageData(newState,0,0);
 				
@@ -178,6 +181,14 @@
 				//Switch offset 0->1 or 1->0
 				currentOffset = !currentOffset
 				
+				var end =  +new Date();
+				var diff = end - start;
+				print(currentFrame + " " + diff1 + "/" + diff)
+				
+				if(step){
+					running = false;
+					step = false;
+				}
 				
 				requestAnimationFrame(gameLoop);
 			}
@@ -200,8 +211,24 @@
 			$(canvas).mousemove(mouseHandle);
 			$(canvas).mousedown(clickHandle);
 			$(canvas).mouseup(clickHandle);
+			$("#btnStop").click(function(){
+				if(running){
+					running = false;
+					$("#btnStop").val("Start");
+				}else{
+					running = true;
+					$("#btnStop").val("Stop");
+					requestAnimationFrame(gameLoop);
+				}
+			});
 			
-			context.fillText("This will be a pretty good initial condition", 0,10);
+			$("#btnStep").click(function(){
+					running = true;
+					step = true;
+					requestAnimationFrame(gameLoop);
+			});
+			
+			context.fillText("Initial Condition", 0,10);
 			context.fillRect(width/2, height/2, 1, 1);
 			
 			newState = context.createImageData(width, height)
@@ -224,6 +251,8 @@
 		<br/>
 		
 		<span id="currentFrame">Current Frame: 0</span>
+		<span><input type="button" id="btnStop" value="Stop"/></span>
+		<span><input type="button" id="btnStep" value="Step"/></span>
 		<span id="mousePos"></span>
 		<span id="mouseClick"></span>
 		
