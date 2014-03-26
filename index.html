@@ -28,6 +28,10 @@
 		};
 	})();
 	
+	var print = function(str){
+		console.debug(str);
+	}
+	
 	</script>
 	
 	<script type="text/javascript">
@@ -80,56 +84,84 @@
 		var context;
 		
 		var running = false;
-		
+		var count = 0;
 		
 		var height = 600;
 		var width = 600;
 
 		
-		var currentOffset = false;
-		
+		var currentOffset = 0;
 		
 		function mouseHandle(e){
 			xPos = e.clientX;
 			yPos = e.clientY;
 			$("#mousePos").html(e.pageX+" "+e.pageY+";"+e.clientX+" "+e.clientY);
-			
-			
-			
 		}
 		
 		
 		function clickHandle(e){
 			$("#mouseClick").html(e.which);
-			
+		
 			button = e.which;
 			eventType = e.type;
+			
 			if(button==1){
 				if(eventType == "mouseup"){
 					e.stopPropagation();
 				}else if(eventType == "mousedown"){
-					
-					
-					
 					e.stopPropagation();
 				}
 			}
+			
 		}
 		
 		function gameLoop(){
 		
 			if(running){
-				context.clearRect(0,0,canvas.width,canvas.height);
+			
+				
+			
+				currentState = context.getImageData(0, 0, width, height).data;
+				newState = context.createImageData(width, height)
+			
+				context.clearRect(0,0,width, height);
 			
 				//update
 				
-			
-				//draw
+				for(var i=0;i<height;i+=2){
+					for(var j=0;j<width;j+=2){
+						var x = j+currentOffset;
+						var y = i+currentOffset;
+						
+						var a1 = ((width * ((y)%height)) + ((x)%width)) * 4;
+						var a2 = ((width * ((y)%height)) + ((x+1)%width)) * 4;
+						var a3 = ((width * ((y+1)%height)) + ((x)%width)) * 4;
+						var a4 = ((width * ((y+1)%height)) + ((x+1)%width)) * 4;
+						
+						var c1 = (currentState[a1]==255)*1; //we only care about the red channel at the moment
+						var c2 = (currentState[a2]==255)*1;
+						var c3 = (currentState[a3]==255)*1;
+						var c4 = (currentState[a4]==255)*1;
+
+						
+						cellIndex = configRuleToIdx[[c1,c2,c3,c4]];
+
+
+						transitionConfig = configIdxToRule[rules[cellIndex]] //this is our transition function
+						
+						newState.data[a1] = transitionConfig[0]*255;
+						newState.data[a2] = transitionConfig[1]*255;
+						newState.data[a3] = transitionConfig[2]*255;
+						newState.data[a4] = transitionConfig[3]*255;
+						
+					}
+				}
 				
 				
+				context.putImageData(newState,0,0);
 				
-				//cleanup
-				
+				//Switch offset 0->1 or 1->0
+				currentOffset = !currentOffset
 				
 				requestAnimationFrame(gameLoop);
 			}
