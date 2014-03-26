@@ -84,23 +84,24 @@
 		var context;
 		
 		var running = false;
-		var count = 0;
+		var currentFrame = 0;
 		
 		var height = 600;
 		var width = 600;
 
+		var newState = 0;
 		
 		var currentOffset = 0;
 		
 		function mouseHandle(e){
 			xPos = e.clientX;
 			yPos = e.clientY;
-			$("#mousePos").html(e.pageX+" "+e.pageY+";"+e.clientX+" "+e.clientY);
+			//$("#mousePos").html(e.pageX+" "+e.pageY+";"+e.clientX+" "+e.clientY);
 		}
 		
 		
 		function clickHandle(e){
-			$("#mouseClick").html(e.which);
+			//$("#mouseClick").html(e.which);
 		
 			button = e.which;
 			eventType = e.type;
@@ -115,6 +116,11 @@
 			
 		}
 		
+		function updateFrameCount(){
+			currentFrame++;
+			$('#currentFrame').html("Current Frame: "+currentFrame);
+		}
+		
 		function gameLoop(){
 		
 			if(running){
@@ -122,7 +128,7 @@
 				
 			
 				currentState = context.getImageData(0, 0, width, height).data;
-				newState = context.createImageData(width, height)
+				
 			
 				context.clearRect(0,0,width, height);
 			
@@ -146,22 +152,32 @@
 						
 						cellIndex = configRuleToIdx[[c1,c2,c3,c4]];
 
-
-						transitionConfig = configIdxToRule[rules[cellIndex]] //this is our transition function
+						
+						transitionIndex = rules[cellIndex];
+						transitionConfig = configIdxToRule[transitionIndex] //this is our transition function
 						
 						newState.data[a1] = transitionConfig[0]*255;
 						newState.data[a2] = transitionConfig[1]*255;
 						newState.data[a3] = transitionConfig[2]*255;
 						newState.data[a4] = transitionConfig[3]*255;
 						
+						
+						
+						newState.data[a1+3] = 255;
+						newState.data[a2+3] = 255;
+						newState.data[a3+3] = 255;
+						newState.data[a4+3] = 255;
+						
 					}
 				}
 				
-				
 				context.putImageData(newState,0,0);
+				
+				updateFrameCount();
 				
 				//Switch offset 0->1 or 1->0
 				currentOffset = !currentOffset
+				
 				
 				requestAnimationFrame(gameLoop);
 			}
@@ -177,7 +193,7 @@
 			
 			context = canvas.getContext('2d');
 			
-			context.fillStyle = "black";
+			context.fillStyle = "red";
 			context.strokeStyle = "black";
 			context.font="10px Arial";
 			
@@ -185,8 +201,10 @@
 			$(canvas).mousedown(clickHandle);
 			$(canvas).mouseup(clickHandle);
 			
-			context.fillText("Sample String", 0,10);
+			context.fillText("This will be a pretty good initial condition", 0,10);
+			context.fillRect(width/2, height/2, 1, 1);
 			
+			newState = context.createImageData(width, height)
 			
 			running = true;
 			requestAnimationFrame(gameLoop);
@@ -205,6 +223,7 @@
 		<canvas id="canvas">Your browser doesn't support canvas.</canvas>
 		<br/>
 		
+		<span id="currentFrame">Current Frame: 0</span>
 		<span id="mousePos"></span>
 		<span id="mouseClick"></span>
 		
