@@ -1,0 +1,182 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Cellular Automaton</title>
+	
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+	
+	<style type="text/css">
+		#canvas{
+			margin:5px;
+			border:1px solid black;
+		}
+	</style>
+	
+	<script type="text/javascript">
+	
+	window.requestAnimFrame = (function(){
+		return  window.requestAnimationFrame || 
+		window.webkitRequestAnimationFrame   || 
+		window.mozRequestAnimationFrame      || 
+		window.oRequestAnimationFrame        || 
+		window.msRequestAnimationFrame       || 
+		function(callback, element){
+			window.setTimeout(function(){
+				callback(+new Date);
+			}, 1000 / 60);
+		};
+	})();
+	
+	</script>
+	
+	<script type="text/javascript">
+	//binary from 0 to 15
+	var configurations = [
+		[0,0,0,0],
+		[1,0,0,0],
+		[0,1,0,0],
+		[1,1,0,0],
+		[0,0,1,0],
+		[1,0,1,0],
+		[0,1,1,0],
+		[1,1,1,0],
+		[0,0,0,1],
+		[1,0,0,1],
+		[0,1,0,1],
+		[1,1,0,1],
+		[0,0,1,1],
+		[1,0,1,1],
+		[0,1,1,1],
+		[1,1,1,1]
+	];
+	
+	var configIdxToRule = {}
+	var configRuleToIdx = {}
+	
+	//D15;14;13;3;11;5;6;1;7;9;10;2;12;4;8;0
+	var rules = []
+	var ruleString = "15;14;13;3;11;5;6;1;7;9;10;2;12;4;8;0"
+	function initRules(){
+		temp = ruleString.split(";");
+		for(a=0;a<temp.length;a++){
+			rules.push(parseInt(temp[a]));
+		}
+		
+		for(a=0;a<configurations.length;a++){
+			configIdxToRule[a] = configurations[a];
+			configRuleToIdx[configurations[a]] = a;
+		}
+		
+	};
+	
+	initRules();
+	
+	</script>
+	
+	<script type="text/javascript">
+	
+		var canvas;
+		var context;
+		
+		var running = false;
+		
+		
+		var height = 600;
+		var width = 600;
+
+		
+		var currentOffset = false;
+		
+		
+		function mouseHandle(e){
+			xPos = e.clientX;
+			yPos = e.clientY;
+			$("#mousePos").html(e.pageX+" "+e.pageY+";"+e.clientX+" "+e.clientY);
+			
+			
+			
+		}
+		
+		
+		function clickHandle(e){
+			$("#mouseClick").html(e.which);
+			
+			button = e.which;
+			eventType = e.type;
+			if(button==1){
+				if(eventType == "mouseup"){
+					e.stopPropagation();
+				}else if(eventType == "mousedown"){
+					
+					
+					
+					e.stopPropagation();
+				}
+			}
+		}
+		
+		function gameLoop(){
+		
+			if(running){
+				context.clearRect(0,0,canvas.width,canvas.height);
+			
+				//update
+				
+			
+				//draw
+				
+				
+				
+				//cleanup
+				
+				
+				requestAnimationFrame(gameLoop);
+			}
+		}
+		
+		
+		
+		function init(){
+			canvas = document.getElementById("canvas");
+			
+			canvas.height = height;
+			canvas.width  = width;
+			
+			context = canvas.getContext('2d');
+			
+			context.fillStyle = "black";
+			context.strokeStyle = "black";
+			context.font="10px Arial";
+			
+			$(canvas).mousemove(mouseHandle);
+			$(canvas).mousedown(clickHandle);
+			$(canvas).mouseup(clickHandle);
+			
+			context.fillText("Sample String", 0,10);
+			
+			
+			running = true;
+			requestAnimationFrame(gameLoop);
+		}
+		
+		
+		$(document).ready(function(){
+			init();
+		});
+		
+
+	</script>
+</head>
+<body>
+	<div id="wrapper">
+		<canvas id="canvas">Your browser doesn't support canvas.</canvas>
+		<br/>
+		
+		<span id="mousePos"></span>
+		<span id="mouseClick"></span>
+		
+		<p>This is an attempt at modeling the Critters cellular automaton which works off of the Margolus Neighborhood.</p>
+	</div>
+</body>
+</html>
