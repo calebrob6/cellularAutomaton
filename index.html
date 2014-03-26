@@ -233,7 +233,7 @@
 			
 			newState = context.createImageData(width, height)
 			
-			running = true;
+			running = false;
 			requestAnimationFrame(gameLoop);
 		}
 		
@@ -251,7 +251,7 @@
 		<br/>
 		
 		<span id="currentFrame">Current Frame: 0</span>
-		<span><input type="button" id="btnStop" value="Stop"/></span>
+		<span><input type="button" id="btnStop" value="Start"/></span>
 		<span><input type="button" id="btnStep" value="Step"/></span>
 		<span id="mousePos"></span>
 		<span id="mouseClick"></span>
