@@ -1,0 +1,322 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Cellular Automaton</title>
+	
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+	
+	<style type="text/css">
+		#canvas{
+			margin:5px;
+			border:1px solid black;
+		}
+	</style>
+	
+	<script type="text/javascript">
+	
+	window.requestAnimFrame = (function(){
+		return  window.requestAnimationFrame || 
+		window.webkitRequestAnimationFrame   || 
+		window.mozRequestAnimationFrame      || 
+		window.oRequestAnimationFrame        || 
+		window.msRequestAnimationFrame       || 
+		function(callback, element){
+			window.setTimeout(function(){
+				callback(+new Date);
+			}, 1000 / 60);
+		};
+	})();
+	
+	var print = function(str){
+		console.debug(str);
+	}
+	
+	</script>
+	
+	<script type="text/javascript">
+	//binary from 0 to 15
+	var configurations = [
+		[0,0,0,0],
+		[1,0,0,0],
+		[0,1,0,0],
+		[1,1,0,0],
+		[0,0,1,0],
+		[1,0,1,0],
+		[0,1,1,0],
+		[1,1,1,0],
+		[0,0,0,1],
+		[1,0,0,1],
+		[0,1,0,1],
+		[1,1,0,1],
+		[0,0,1,1],
+		[1,0,1,1],
+		[0,1,1,1],
+		[1,1,1,1]
+	];
+	
+	var configIdxToRule = {}
+	var configRuleToIdx = {}
+	
+	//D15;14;13;3;11;5;6;1;7;9;10;2;12;4;8;0
+	var rules = []
+	var ruleString = "15;14;13;3;11;5;6;1;7;9;10;2;12;4;8;0" //critters
+	var ruleString = "0;8;4;3;2;5;9;7;1;6;10;11;12;13;14;15" //bbm
+	function initRules(){
+		rules = []
+		temp = ruleString.split(";");
+		for(a=0;a<temp.length;a++){
+			rules.push(parseInt(temp[a]));
+		}
+		
+		for(a=0;a<configurations.length;a++){
+			configIdxToRule[a] = configurations[a];
+			configRuleToIdx[configurations[a]] = a;
+		}
+		
+	};
+	
+	initRules();
+	
+	</script>
+	
+	<script type="text/javascript">
+	
+		var canvas;
+		var context;
+		
+		var running = false;
+		var step = false;
+		var stopFlickering = true;
+		var currentFrame = 0;
+		
+		var height = 200;
+		var width = 200;
+
+		var newState = 0;
+		
+		var currentOffset = 0;
+		
+		var oldData = 0
+		
+		function mouseHandle(e){
+			xPos = e.clientX;
+			yPos = e.clientY;
+			//$("#mousePos").html(e.pageX+" "+e.pageY+";"+e.clientX+" "+e.clientY);
+		}
+		
+		
+		function clickHandle(e){
+			//$("#mouseClick").html(e.which);
+		
+			button = e.which;
+			eventType = e.type;
+			
+			if(button==1){
+				if(eventType == "mouseup"){
+					e.stopPropagation();
+				}else if(eventType == "mousedown"){
+					e.stopPropagation();
+				}
+			}
+			
+		}
+		
+		function updateFrameCount(){
+			currentFrame++;
+			$('#currentFrame').html("Current Frame: "+currentFrame);
+		}
+		
+		function gameLoop(){
+		
+			if(running){
+				var start = +new Date();
+				
+				if(stopFlickering){
+					if(currentFrame%2==0){
+						currentState = context.getImageData(0, 0, width, height).data;
+					}else{
+						currentState = oldData
+					}
+				}else{
+					currentState = context.getImageData(0, 0, width, height).data;
+				}
+				//context.clearRect(0,0,width, height);
+			
+				//update
+				var start1 = +new Date(); 
+				for(var i=0;i<height;i+=2){
+					for(var j=0;j<width;j+=2){
+						var x = j+currentOffset;
+						var y = i+currentOffset;
+						
+						var a1 = ((width * ((y)%height)) + ((x)%width)) * 4;
+						var a2 = ((width * ((y)%height)) + ((x+1)%width)) * 4;
+						var a3 = ((width * ((y+1)%height)) + ((x)%width)) * 4;
+						var a4 = ((width * ((y+1)%height)) + ((x+1)%width)) * 4;
+						
+						var c1 = (currentState[a1]==255)*1; //we only care about the red channel at the moment
+						var c2 = (currentState[a2]==255)*1;
+						var c3 = (currentState[a3]==255)*1;
+						var c4 = (currentState[a4]==255)*1;
+
+						
+						cellIndex = configRuleToIdx[[c1,c2,c3,c4]];
+
+						
+						transitionIndex = rules[cellIndex];
+						transitionConfig = configIdxToRule[transitionIndex] //this is our transition function
+						
+						newState.data[a1] = transitionConfig[0]*255;
+						newState.data[a2] = transitionConfig[1]*255;
+						newState.data[a3] = transitionConfig[2]*255;
+						newState.data[a4] = transitionConfig[3]*255;
+						
+						
+						
+						newState.data[a1+3] = 255;
+						newState.data[a2+3] = 255;
+						newState.data[a3+3] = 255;
+						newState.data[a4+3] = 255;
+						
+					}
+				}
+				var end1 =  +new Date();
+				var diff1 = end1 - start1;
+				
+				
+				if(stopFlickering){
+					if(currentFrame%2==1){
+						context.putImageData(newState,0,0);
+					}else{
+						oldData = newState.data
+					}
+				}else{
+					context.putImageData(newState,0,0);
+				}
+				updateFrameCount();
+				
+				//Switch offset 0->1 or 1->0
+				currentOffset = !currentOffset
+				
+				var end =  +new Date();
+				var diff = end - start;
+				print(currentFrame + " " + diff1 + "/" + diff)
+				
+				if(step){
+					running = false;
+					step = false;
+				}
+				
+				requestAnimationFrame(gameLoop);
+			}
+		}
+		
+		
+		
+		function init(){
+			canvas = document.getElementById("canvas");
+			
+			canvas.height = height;
+			canvas.width  = width;
+			
+			context = canvas.getContext('2d');
+			
+			context.fillStyle = "red";
+			context.strokeStyle = "black";
+			context.font="10px Arial";
+			
+			$(canvas).mousemove(mouseHandle);
+			$(canvas).mousedown(clickHandle);
+			$(canvas).mouseup(clickHandle);
+			$("#btnStop").click(function(){
+				if(running){
+					running = false;
+					$("#btnStop").val("Start");
+				}else{
+					running = true;
+					$("#btnStop").val("Stop");
+					requestAnimationFrame(gameLoop);
+				}
+			});
+			
+			$("#btnStep").click(function(){
+					running = true;
+					step = true;
+					requestAnimationFrame(gameLoop);
+			});
+			
+			$("#btnStopFlicker").click(function(){
+				if(stopFlickering){
+					stopFlickering = false;
+					$("#btnStopFlicker").val("Stop Flickering");
+				}else{
+					stopFlickering = true;
+					$("#btnStopFlicker").val("Start Flickering");
+				}
+			});
+			
+			$("#slRule").change(function(){
+				$("#slRule option:selected").each(function(){
+					ruleString = $(this).attr("rule");
+					initRules()
+					print($(this).attr("rule"));
+					print(configIdxToRule);
+					print(configRuleToIdx);
+					print(rules);
+				});
+			});
+			
+			
+			
+			context.fillText("Initial Condition", 0,10);
+			context.fillRect(width/2, height/2, 1, 1);
+			
+			newState = context.createImageData(width, height)
+			
+			running = false;
+			requestAnimationFrame(gameLoop);
+		}
+		
+		
+		$(document).ready(function(){
+			init();
+		});
+		
+
+	</script>
+</head>
+<body>
+	<div id="wrapper">
+		<canvas id="canvas">Your browser doesn't support canvas.</canvas>
+		<br/>
+		
+		<span id="currentFrame">Current Frame: 0</span>
+		<span><input type="button" id="btnStop" value="Start"/></span>
+		<span><input type="button" id="btnStep" value="Step"/></span>
+		<span><input type="button" id="btnStopFlicker" value="Start Flickering"/></span>
+		<span id="mousePos"></span>
+		<span id="mouseClick"></span>
+		
+		<br/>
+		<span>
+			Select rule:
+			<select id="slRule">
+				<option value="" selected>Please select a rule</option>
+				<option value="bbm" rule="0;8;4;3;2;5;9;7;1;6;10;11;12;13;14;15">Billard Ball Model</option>
+				<option value="critters" rule="15;14;13;3;11;5;6;1;7;9;10;2;12;4;8;0">Critters</option>
+				<option value="critters" rule="0;8;4;3;2;5;9;14;1;6;10;13;12;11;7;15">BounceGas</option>
+				<option value="critters" rule="0;8;4;12;2;10;9;7;1;6;5;11;3;13;14;15">BounceGasII</option>
+				<option value="critters" rule="0;8;4;12;2;10;9;14;1;6;5;13;3;11;7;15">HPP_Gas</option>
+				<option value="critters" rule="0;2;8;12;1;10;9;11;4;6;5;14;3;7;13;15">Rotations</option>
+				<option value="critters" rule="0;2;8;12;1;10;9;13;4;6;5;7;3;14;11;15">RotationsII</option>
+				<option value="critters" rule="0;4;8;12;4;12;12;13;8;12;12;14;12;13;14;15">Sand</option>
+				<option value="tron" rule="15;1;2;3;4;5;6;7;8;9;10;11;12;13;14;0">Tron</option>
+			</select>
+		</span>
+		
+		<p>This is an attempt at modeling the Critters cellular automaton which works off of the Margolus Neighborhood.</p>
+		<p>Note, only change the flickering setting when on an even frame</p>
+	</div>
+</body>
+</html>
