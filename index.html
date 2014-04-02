@@ -58,22 +58,35 @@
 	var configIdxToRule = {}
 	var configRuleToIdx = {}
 	
+	for(a=0;a<configurations.length;a++){
+		configIdxToRule[a] = configurations[a];
+		configRuleToIdx[configurations[a]] = a;
+	}
+	
 	//D15;14;13;3;11;5;6;1;7;9;10;2;12;4;8;0
 	var rules = []
 	var ruleString = "15;14;13;3;11;5;6;1;7;9;10;2;12;4;8;0" //critters
-	var ruleString = "0;8;4;3;2;5;9;7;1;6;10;11;12;13;14;15" //bbm
+
 	function initRules(){
 		rules = []
 		temp = ruleString.split(";");
 		for(a=0;a<temp.length;a++){
 			rules.push(parseInt(temp[a]));
 		}
+	};
+	
+	function reverseRules(){
+		newRules = []
 		
-		for(a=0;a<configurations.length;a++){
-			configIdxToRule[a] = configurations[a];
-			configRuleToIdx[configurations[a]] = a;
+		for(a=0;a<rules.length;a++){
+			newRules.push(0);
 		}
 		
+		for(a=0;a<newRules.length;a++){
+			newRules[rules[a]] = a;
+		}
+		rules = newRules;
+		currentOffset = !currentOffset;
 	};
 	
 	initRules();
@@ -87,6 +100,7 @@
 		
 		var running = false;
 		var step = false;
+		var backwards = false;
 		var stopFlickering = true;
 		var currentFrame = 0;
 		
@@ -123,7 +137,11 @@
 		}
 		
 		function updateFrameCount(){
-			currentFrame++;
+			if(backwards){
+				currentFrame--;
+			}else{
+				currentFrame++;
+			}
 			$('#currentFrame').html("Current Frame: "+currentFrame);
 		}
 		
@@ -197,13 +215,21 @@
 				updateFrameCount();
 				
 				//Switch offset 0->1 or 1->0
+				
 				currentOffset = !currentOffset
+				
 				
 				var end =  +new Date();
 				var diff = end - start;
 				print(currentFrame + " " + diff1 + "/" + diff)
-				
+				print(rules);
 				if(step){
+				
+					if(backwards){
+						backwards = false;
+						reverseRules();
+					}
+				
 					running = false;
 					step = false;
 				}
@@ -240,7 +266,32 @@
 				}
 			});
 			
-			$("#btnStep").click(function(){
+			$("#btnBackStop").click(function(){
+				if(running){
+					running = false;
+					$("#btnBackStop").val("Back");
+					backwards = false;
+					reverseRules();
+				}else{
+					running = true;
+					backwards = true;
+					reverseRules();
+					$("#btnBackStop").val("Stop");
+					requestAnimationFrame(gameLoop);
+				}
+			});
+			
+			
+			$("#btnBack").click(function(){
+					running = true;
+					step = true;
+					backwards = true;
+					reverseRules();
+					requestAnimationFrame(gameLoop);
+					
+			});
+			
+			$("#btnForward").click(function(){
 					running = true;
 					step = true;
 					requestAnimationFrame(gameLoop);
@@ -292,8 +343,10 @@
 		<br/>
 		
 		<span id="currentFrame">Current Frame: 0</span>
+		<span><input type="button" id="btnBackStop" value="Back"/></span>
 		<span><input type="button" id="btnStop" value="Start"/></span>
-		<span><input type="button" id="btnStep" value="Step"/></span>
+		<span><input type="button" id="btnBack" value="<"/></span>
+		<span><input type="button" id="btnForward" value=">"/></span>
 		<span><input type="button" id="btnStopFlicker" value="Start Flickering"/></span>
 		<span id="mousePos"></span>
 		<span id="mouseClick"></span>
