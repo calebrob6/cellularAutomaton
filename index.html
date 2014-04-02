@@ -151,7 +151,7 @@
 				var start = +new Date();
 				
 				if(stopFlickering){
-					if(currentFrame%2==0){
+					if(Math.abs(currentFrame%2)==0){
 						currentState = context.getImageData(0, 0, width, height).data;
 					}else{
 						currentState = oldData
@@ -204,7 +204,7 @@
 				
 				
 				if(stopFlickering){
-					if(currentFrame%2==1){
+					if(Math.abs(currentFrame%2)==1){
 						context.putImageData(newState,0,0);
 					}else{
 						oldData = newState.data
