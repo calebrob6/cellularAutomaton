@@ -111,8 +111,11 @@
 		var frameAbs = 0;
 		
 		
-		var height = 50;
-		var width = 50;
+		var height = 4;
+		var width = 4;
+		
+		var numPatterns = Math.pow(2,width*height);
+		var foundNums = [];
 
 		var newState = 0;
 		
@@ -127,13 +130,20 @@
 		}
 		
 		function countOfPixels(){
-			var numRed = 0;
+		
+			var binaryString = "";
 			for(var i=0;i<newState.data.length;i+=4){
 				if(newState.data[i]==255){
-					numRed++;
+					binaryString+="1";
+				}else{
+					binaryString+="0"
 				}
 			}
-			return numRed;
+			currentNum = parseInt(binaryString,2);
+			if(foundNums.indexOf(currentNum)==-1){
+				foundNums.push(currentNum);
+			}
+			return foundNums.length;
 		}
 		
 		function addGraphPoint(val){
@@ -240,7 +250,7 @@
 				
 				updateFrameCount();
 				
-				addGraphPoint(countOfPixels()/(height*width))
+				addGraphPoint(countOfPixels());
 				
 				//Switch offset 0->1 or 1->0
 				
@@ -275,7 +285,7 @@
 			canvas.width  = width;
 			
 			context = canvas.getContext('2d');
-			
+			context.imageSmoothingEnabled= false;
 			context.fillStyle = "red";
 			context.strokeStyle = "black";
 			context.font="10px Arial";
@@ -286,20 +296,20 @@
 			
 			registerButtonHandlers();
 			
-			var randPercent = 25;
+			var randPercent = 10;
 			var randomBits = height*width*randPercent/100;
 			
 			for(var i=0;i<randomBits;i++){
-				var randX = Math.floor(Math.random()*width/2);
-				var randY = Math.floor(Math.random()*height/2);
+				var randX = Math.floor(Math.random()*width);
+				var randY = Math.floor(Math.random()*height);
 				context.fillRect(randX, randY, 1, 1);
 			}
 			
 			newState = context.getImageData(0, 0, width, height);
 			
 			
-			plot1 = $.jqplot('chartdiv', [[0,countOfPixels()/(height*width)]], {
-				title:'Percentage Covered',
+			plot1 = $.jqplot('chartdiv', [[0,countOfPixels()]], {
+				title:'Number of unique configurations obtained',
 				seriesDefaults: {
 					rendererOptions: {
 						smooth: false,
