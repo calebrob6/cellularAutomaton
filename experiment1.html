@@ -4,7 +4,11 @@
 <head>
 	<title>Cellular Automaton</title>
 	
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+	
+	<script language="javascript" type="text/javascript" src="lib/jquery.min.js"></script>
+	<script language="javascript" type="text/javascript" src="lib/jquery.jqplot.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="lib/jquery.jqplot.css" />
+	
 	
 	<style type="text/css">
 		#canvas{
@@ -102,16 +106,19 @@
 		var step = false;
 		var backwards = false;
 		var stopFlickering = true;
-		var currentFrame = 0;
 		
-		var height = 200;
-		var width = 200;
+		var currentFrame = 0;
+		var frameAbs = 0;
+		
+		
+		var height = 50;
+		var width = 50;
 
 		var newState = 0;
 		
 		var currentOffset = 0;
-		
-		var oldData = 0
+		var plot1;
+		var oldData = 0;
 		
 		function mouseHandle(e){
 			xPos = e.clientX;
@@ -119,6 +126,23 @@
 			//$("#mousePos").html(e.pageX+" "+e.pageY+";"+e.clientX+" "+e.clientY);
 		}
 		
+		function countOfPixels(){
+			var numRed = 0;
+			for(var i=0;i<newState.data.length;i+=4){
+				if(newState.data[i]==255){
+					numRed++;
+				}
+			}
+			return numRed;
+		}
+		
+		function addGraphPoint(val){
+		
+			plot1.series[0].data.push([frameAbs, val]);
+			plot1.resetAxesScale();
+			plot1.replot();
+		
+		}	
 		
 		function clickHandle(e){
 			//$("#mouseClick").html(e.which);
@@ -142,6 +166,7 @@
 			}else{
 				currentFrame++;
 			}
+			frameAbs++;
 			$('#currentFrame').html("Current Frame: "+currentFrame);
 		}
 		
@@ -151,7 +176,7 @@
 				var start = +new Date();
 				
 				if(stopFlickering){
-					if(currentFrame%2==0){
+					if(Math.abs(currentFrame%2)==0){
 						currentState = context.getImageData(0, 0, width, height).data;
 					}else{
 						currentState = oldData
@@ -204,7 +229,7 @@
 				
 				
 				if(stopFlickering){
-					if(currentFrame%2==1){
+					if(Math.abs(currentFrame%2)==1){
 						context.putImageData(newState,0,0);
 					}else{
 						oldData = newState.data
@@ -212,7 +237,10 @@
 				}else{
 					context.putImageData(newState,0,0);
 				}
+				
 				updateFrameCount();
+				
+				addGraphPoint(countOfPixels()/(height*width))
 				
 				//Switch offset 0->1 or 1->0
 				
@@ -255,6 +283,36 @@
 			$(canvas).mousemove(mouseHandle);
 			$(canvas).mousedown(clickHandle);
 			$(canvas).mouseup(clickHandle);
+			
+			registerButtonHandlers();
+			
+			var randPercent = 25;
+			var randomBits = height*width*randPercent/100;
+			
+			for(var i=0;i<randomBits;i++){
+				var randX = Math.floor(Math.random()*width/2);
+				var randY = Math.floor(Math.random()*height/2);
+				context.fillRect(randX, randY, 1, 1);
+			}
+			
+			newState = context.getImageData(0, 0, width, height);
+			
+			
+			plot1 = $.jqplot('chartdiv', [[0,countOfPixels()/(height*width)]], {
+				title:'Percentage Covered',
+				seriesDefaults: {
+					rendererOptions: {
+						smooth: false,
+						
+					}
+				}
+			});
+			
+			running = false;
+			requestAnimationFrame(gameLoop);
+		}
+		
+		function registerButtonHandlers(){
 			$("#btnStop").click(function(){
 				if(running){
 					running = false;
@@ -317,21 +375,12 @@
 					print(rules);
 				});
 			});
-			
-			
-			
-			context.fillText("Initial Condition", 0,10);
-			context.fillRect(width/2, height/2, 1, 1);
-			
-			newState = context.createImageData(width, height)
-			
-			running = false;
-			requestAnimationFrame(gameLoop);
 		}
-		
 		
 		$(document).ready(function(){
 			init();
+			
+
 		});
 		
 
@@ -370,6 +419,9 @@
 		
 		<p>This is an attempt at modeling the Critters cellular automaton which works off of the Margolus Neighborhood.</p>
 		<p>Note, only change the flickering setting when on an even frame</p>
+		
+		<div id="chartdiv" style="height:400px;width:300px; "></div>
+		
 	</div>
 </body>
 </html>
