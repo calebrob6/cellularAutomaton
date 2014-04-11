@@ -11,10 +11,10 @@ public class Rules {
 		"0;8;4;3;2;5;9;14;1;6;10;13;12;11;7;15" //BounceGas
 	};
 	
-	public static String[] configurations = {"0000","1000","0100","1100","0010","1010","0110","1110","0001","1001","0101","1101","0011","1011","0111","1111"};
-
-	public HashMap<String, Integer> configRuleToIdx = new HashMap<String, Integer>();
-	public HashMap<Integer, String> configIdxToRule = new HashMap<Integer, String>();
+	//public static String[] configurations = {"0000","1000","0100","1100","0010","1010","0110","1110","0001","1001","0101","1101","0011","1011","0111","1111"};
+	public static final Byte[] configurations = {0X00,0X08,0X04,0X0C,0X02,0X0A,0X06,0X0E,0X01,0X09,0X05,0X0D,0X03,0X0B,0X07,0X0F};
+	public HashMap<Byte, Integer> configRuleToIdx = new HashMap<Byte, Integer>();
+	public HashMap<Integer, Byte> configIdxToRule = new HashMap<Integer, Byte>();
 
 	public int[] rules;
 

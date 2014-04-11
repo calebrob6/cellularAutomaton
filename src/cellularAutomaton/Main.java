@@ -4,6 +4,12 @@ public class Main {
 
 	public static void main(String[] args) {
 
+		long start = System.currentTimeMillis();
+		
+		if(args.length<3){
+			System.out.println("Usage:./thisProgram width height 'ruleString'");
+			return;
+		}
 		
 		int width = Integer.parseInt(args[0]);
 		int height = Integer.parseInt(args[1]);
@@ -41,7 +47,7 @@ public class Main {
 		currentState.fillMiddleSquare(10);
 		
 		currentState.writeMapToImage("initial.png");
-		System.out.println(currentState.calculateEntropy());
+		//System.out.println(currentState.calculateEntropy());
 
 		int frameAbs = 0;
 		int currentFrame = 0;
@@ -80,22 +86,24 @@ public class Main {
 					int a3 = ((width * ((y + 1) % height)) + ((x) % width));
 					int a4 = ((width * ((y + 1) % height)) + ((x + 1) % width));
 
-					int c1 = (currentState.map[a1] == true) ? 1 : 0;
-					int c2 = (currentState.map[a2] == true) ? 1 : 0;
-					int c3 = (currentState.map[a3] == true) ? 1 : 0;
-					int c4 = (currentState.map[a4] == true) ? 1 : 0;
+					byte c1 = (byte) ((currentState.map[a1] == true) ? 0X08 : 0X00);
+					byte c2 = (byte) ((currentState.map[a2] == true) ? 0X04 : 0X00);
+					byte c3 = (byte) ((currentState.map[a3] == true) ? 0X02 : 0X00);
+					byte c4 = (byte) ((currentState.map[a4] == true) ? 0X01 : 0X00);
 
-					Integer[] ruleIndex = new Integer[] { c1, c2, c3, c4 };
-
-					int cellIndex = rules.configRuleToIdx.get("" + c1 + c2 + c3 + c4);
+					//Integer[] ruleIndex = new Integer[] { c1, c2, c3, c4 };
+					//int cellIndex = rules.configRuleToIdx.get("" + c1 + c2 + c3 + c4);
+					
+					Byte temp = (byte) (0X00 | c1 | c2 | c3 | c4);
+					int cellIndex = rules.configRuleToIdx.get(temp);
 
 					int transitionIndex = rules.rules[cellIndex];
-					String transitionConfigTemp = rules.configIdxToRule.get(transitionIndex);
+					Byte transitionConfigTemp = rules.configIdxToRule.get(transitionIndex);
 
-					currentState.map[a1] = transitionConfigTemp.charAt(0) == '1';
-					currentState.map[a2] = transitionConfigTemp.charAt(1) == '1';
-					currentState.map[a3] = transitionConfigTemp.charAt(2) == '1';
-					currentState.map[a4] = transitionConfigTemp.charAt(3) == '1';
+					currentState.map[a1] = (transitionConfigTemp & 0X08) == 0X08;
+					currentState.map[a2] = (transitionConfigTemp & 0X04) == 0X04;
+					currentState.map[a3] = (transitionConfigTemp & 0X02) == 0X02;
+					currentState.map[a4] = (transitionConfigTemp & 0X01) == 0X01;
 
 				}
 			}
@@ -128,7 +136,8 @@ public class Main {
 		}
 
 		currentState.writeMapToImage("final.png");
-		System.out.println(currentState.calculateEntropy());
+		//System.out.println(currentState.calculateEntropy());
+		System.out.println(String.format("Done in %d seconds",System.currentTimeMillis()-start));
 	}
 
 	private static void updateFrameCount() {
