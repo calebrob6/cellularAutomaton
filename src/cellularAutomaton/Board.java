@@ -104,11 +104,14 @@ public class Board {
 	}
 	
 	public double calculateEntropy(){
+		/*
 		double returnVal = 0;
 		for(int i=0;i<map.length;i++){
 			returnVal+=(map[i]) ? Math.log(255) : 0;
 		}
 		return returnVal;
+		*/
+		return 0;
 	}
 
 	public void fillMiddleSquare(int l) {
