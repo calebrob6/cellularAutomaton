@@ -103,12 +103,24 @@ public class Board {
 		return true;
 	}
 	
-	public long calculateEntropy(){
-		long returnVal = 0;
+	public double calculateEntropy(){
+		double returnVal = 0;
 		for(int i=0;i<map.length;i++){
-			returnVal+=(map[i]) ? Math.log(1) : 0;
+			returnVal+=(map[i]) ? Math.log(255) : 0;
 		}
 		return returnVal;
+	}
+
+	public void fillMiddleSquare(int l) {
+		int middleX = width/2;
+		int middleY = height/2;
+		
+		for(int y=middleY-l/2;y<middleY+l/2;y++){
+			for(int x=middleX-l/2;x<middleX+l/2;x++){
+				this.map[(width * y) + (x)] = true;
+			}
+		}
+		
 	}
 
 }

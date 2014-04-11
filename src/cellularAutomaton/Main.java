@@ -4,14 +4,42 @@ public class Main {
 
 	public static void main(String[] args) {
 
-		int width = 500;
-		int height = 500;
-
+		
+		int width = Integer.parseInt(args[0]);
+		int height = Integer.parseInt(args[1]);
+		
+		
+		boolean useRuleString = false;
+		int ruleStringIndex = -1;
+		String ruleString = "";
+		
+		//find -c
+		for(int i=0;i<args.length;i++){
+			if(args[i].equals("-c")){
+				useRuleString = true;
+				ruleString = args[i+1];
+				break;
+			}
+		}
+		
+		if(!useRuleString){
+			ruleStringIndex = Integer.parseInt(args[2]);
+		}
+		
 		boolean stopFlickering = false;
 		Board currentState = new Board(width, height);
 		Rules rules = new Rules();
-		rules.setRules(Rules.ruleSets[1]);
-		currentState.fillRandomPercent(10);
+		
+		if(useRuleString){
+			rules.setRules(ruleString);
+		}else{
+			rules.setRules(Rules.ruleSets[ruleStringIndex]);
+		}
+		
+		
+		currentState.fillRandomPercent(1);
+		currentState.fillMiddleSquare(10);
+		
 		currentState.writeMapToImage("initial.png");
 		System.out.println(currentState.calculateEntropy());
 
@@ -24,6 +52,10 @@ public class Main {
 
 		while (currentFrame < 1000) {
 			long startTime = System.currentTimeMillis();
+			
+			if(currentFrame%100==0){
+				currentState.writeMapToImage("state"+currentFrame+".png");
+			}
 
 			if (stopFlickering) {
 				if (Math.abs(currentFrame % 2) == 0) {
@@ -92,7 +124,7 @@ public class Main {
 			long end = System.currentTimeMillis();
 			long diff = end - startTime;
 
-			//System.out.println(currentFrame + " " + diff1 + "/" + diff);
+			System.out.println(currentFrame + " " + diff1 + "/" + diff);
 		}
 
 		currentState.writeMapToImage("final.png");
