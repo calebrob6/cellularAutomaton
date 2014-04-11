@@ -40,17 +40,32 @@ public class Board {
 
 		this.map = new boolean[width * height];
 		for (int i = 0; i < map.length; i++) {
-
 			boolean decision = false;
-			if (rand.nextBoolean() == true && numRandomOn > 0) {
+			if(rand.nextBoolean() && numRandomOn>0){
 				decision = true;
 				numRandomOn--;
 			}
-
 			this.map[i] = decision;
 		}
+		
 	}
 
+	public void fillRandomPercent(long percent){
+		int size = width * height;
+		int numPixels = Math.round(size*percent/100);
+	
+		Random rand = new Random();
+
+		for (int i = 0; i < map.length; i++) {
+			this.map[i] = false;
+		}
+		
+		for(int i=0;i<numPixels;i++){
+			this.map[(width * rand.nextInt(height)) + (rand.nextInt(width))] = true;
+		}
+		
+	}
+	
 	public boolean writeMapToImage(String filename) {
 
 		// BufferedImage image = new
@@ -86,6 +101,14 @@ public class Board {
 		}
 
 		return true;
+	}
+	
+	public long calculateEntropy(){
+		long returnVal = 0;
+		for(int i=0;i<map.length;i++){
+			returnVal+=(map[i]) ? Math.log(1) : 0;
+		}
+		return returnVal;
 	}
 
 }

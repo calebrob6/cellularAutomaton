@@ -4,18 +4,16 @@ public class Main {
 
 	public static void main(String[] args) {
 
-		int width = 200;
-		int height = 200;
+		int width = 500;
+		int height = 500;
 
 		boolean stopFlickering = false;
-		Board currentState = new Board(800, 800, 5000);
+		Board currentState = new Board(width, height);
 		Rules rules = new Rules();
-		rules.setRules("15;14;13;3;11;5;6;1;7;9;10;2;12;4;8;0");
+		rules.setRules(Rules.ruleSets[1]);
+		currentState.fillRandomPercent(10);
 		currentState.writeMapToImage("initial.png");
-
-		Integer test[] = { 1, 0, 0, 0 };
-		System.out.println(rules.configIdxToRule.get(0));
-		System.out.println(rules.configRuleToIdx.get(Rules.configurations[0]));
+		System.out.println(currentState.calculateEntropy());
 
 		int frameAbs = 0;
 		int currentFrame = 0;
@@ -23,6 +21,7 @@ public class Main {
 		boolean backwards = false;
 
 		boolean running = true;
+
 		while (currentFrame < 1000) {
 			long startTime = System.currentTimeMillis();
 
@@ -56,12 +55,10 @@ public class Main {
 
 					Integer[] ruleIndex = new Integer[] { c1, c2, c3, c4 };
 
-					int cellIndex = rules.configRuleToIdx.get("" + c1 + c2 + c3
-							+ c4);
+					int cellIndex = rules.configRuleToIdx.get("" + c1 + c2 + c3 + c4);
 
 					int transitionIndex = rules.rules[cellIndex];
-					String transitionConfigTemp = rules.configIdxToRule
-							.get(transitionIndex);
+					String transitionConfigTemp = rules.configIdxToRule.get(transitionIndex);
 
 					currentState.map[a1] = transitionConfigTemp.charAt(0) == '1';
 					currentState.map[a2] = transitionConfigTemp.charAt(1) == '1';
@@ -95,11 +92,11 @@ public class Main {
 			long end = System.currentTimeMillis();
 			long diff = end - startTime;
 
-			System.out.println(currentFrame + " " + diff1 + "/" + diff);
+			//System.out.println(currentFrame + " " + diff1 + "/" + diff);
 		}
-		
-		currentState.writeMapToImage("final.png");
 
+		currentState.writeMapToImage("final.png");
+		System.out.println(currentState.calculateEntropy());
 	}
 
 	private static void updateFrameCount() {
