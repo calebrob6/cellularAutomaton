@@ -32,7 +32,7 @@ public class Board {
 		}
 	}
 
-	public void fillRandomPercent(Double percent){
+	public void fillRandomPercent(double percent){
 		long size = width * height;
 		long numPixels = Math.round(size*(percent/100l));
 	
@@ -44,7 +44,18 @@ public class Board {
 		
 	}
 	
-	public boolean writeMapToImage(String filename) {
+	public void writeMapToImage(String fn){
+		BufferedImage image = getImageMap();
+		
+		try {
+			ImageIO.write((RenderedImage) image, "PNG", new File(fn));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
+	public BufferedImage getImageMap() {
 
 		// BufferedImage image = new
 		// BufferedImage(width,this.height,BufferedImage.TYPE_BYTE_GRAY);
@@ -69,13 +80,8 @@ public class Board {
 		bGr.drawImage(image, 0, 0, null);
 		bGr.dispose();
 
-		try {
-			ImageIO.write((RenderedImage) bimage, "PNG", new File(filename));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 
-		return true;
+		return bimage;
 	}
 	
 	public double calculateEntropy(){

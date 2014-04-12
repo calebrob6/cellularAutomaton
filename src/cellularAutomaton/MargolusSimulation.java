@@ -12,6 +12,7 @@ public class MargolusSimulation {
 	
 	private Rules rules;
 	private Board board;
+	private double initialRandomPercent;
 	
 	public MargolusSimulation(int width, int height, String ruleString, int numCycles){
 		
@@ -24,10 +25,12 @@ public class MargolusSimulation {
 		this.rules = new Rules(ruleString);
 		this.board = new Board(width, height);
 		
+		this.initialRandomPercent = (double) 0;
+		
 	}
 	
-	public void setInitialRandom(Double percent){
-		
+	public void setInitialRandom(double percent){
+		this.initialRandomPercent = percent;
 		this.board.clear();
 		this.board.fillRandomPercent(percent);
 
@@ -42,24 +45,22 @@ public class MargolusSimulation {
 
 		boolean cycleFound = false;
 		int cycleLength = 0;
+		
+		long start = System.currentTimeMillis();
 
 		while (currentFrame < numCycles) {
 			
 			long startTime = System.currentTimeMillis();
 			
-			if(currentFrame%100==0){
-				this.board.writeMapToImage("state"+currentFrame+".png");
-			}
 			
-
-			if(cycleMap.containsKey(Arrays.deepHashCode(this.board.map))){
+			if(cycleMap.containsKey(Arrays.hashCode(this.board.map))){
 				cycleFound = true;
-				cycleMap.put(Arrays.deepHashCode(this.board.map), true);
+				cycleMap.put(Arrays.hashCode(this.board.map), true);
 			}else if(!cycleFound){
-				cycleMap.put(Arrays.deepHashCode(this.board.map), true);
+				cycleMap.put(Arrays.hashCode(this.board.map), true);
 				cycleLength++;
 			}
-
+				
 
 
 			long start1 = System.currentTimeMillis();
@@ -103,10 +104,15 @@ public class MargolusSimulation {
 			long end = System.currentTimeMillis();
 			long diff = end - startTime;
 
-			//System.out.println(currentFrame + " " + diff1 + "/" + diff);
+			currentFrame++;
+			System.out.println(currentFrame + " " + diff1 + "/" + diff);
 		}
 		
-		
+		experiment.timeTaken = System.currentTimeMillis() - start;
+		experiment.numFrames = currentFrame;
+		experiment.cycleLength = cycleLength;
+		experiment.cycleFound = cycleFound;
+		experiment.initialRandomPercent = initialRandomPercent;
 		
 		return experiment;
 	}
