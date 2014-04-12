@@ -27,6 +27,14 @@ public class Rules {
 
 	}
 
+	public Rules(String ruleString) {
+		for (int i = 0; i < Rules.configurations.length; i++) {
+			this.configIdxToRule.put(i, Rules.configurations[i]);
+			this.configRuleToIdx.put(Rules.configurations[i], i);
+		}
+		setRules(ruleString);
+	}
+
 	public void setRules(String ruleString) {
 		String[] ruleParts = ruleString.split(";");
 		this.rules = new int[ruleParts.length];

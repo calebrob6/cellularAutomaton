@@ -18,7 +18,7 @@ public class Board {
 
 	public int width = 0;
 	public int height = 0;
-	public boolean[] map;
+	public Boolean[] map;
 
 	private boolean currentOffset = false;
 
@@ -26,40 +26,18 @@ public class Board {
 		this.width = width;
 		this.height = height;
 
-		this.map = new boolean[width * height];
+		this.map = new Boolean[width * height];
 		for (int i = 0; i < map.length; i++) {
 			this.map[i] = false;
 		}
 	}
 
-	public Board(int width, int height, int numRandomOn) {
-		this.width = width;
-		this.height = height;
-
-		Random rand = new Random();
-
-		this.map = new boolean[width * height];
-		for (int i = 0; i < map.length; i++) {
-			boolean decision = false;
-			if(rand.nextBoolean() && numRandomOn>0){
-				decision = true;
-				numRandomOn--;
-			}
-			this.map[i] = decision;
-		}
-		
-	}
-
-	public void fillRandomPercent(long percent){
-		int size = width * height;
-		int numPixels = Math.round(size*percent/100);
+	public void fillRandomPercent(Double percent){
+		long size = width * height;
+		long numPixels = Math.round(size*(percent/100l));
 	
 		Random rand = new Random();
 
-		for (int i = 0; i < map.length; i++) {
-			this.map[i] = false;
-		}
-		
 		for(int i=0;i<numPixels;i++){
 			this.map[(width * rand.nextInt(height)) + (rand.nextInt(width))] = true;
 		}
@@ -84,12 +62,9 @@ public class Board {
 			}
 		}
 
-		MemoryImageSource source = new MemoryImageSource(this.width,
-				this.height, cm, pixels, 0, this.width);
+		MemoryImageSource source = new MemoryImageSource(this.width, this.height, cm, pixels, 0, this.width);
 		Image image = Toolkit.getDefaultToolkit().createImage(source);
-
-		BufferedImage bimage = new BufferedImage(image.getWidth(null),
-				image.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+		BufferedImage bimage = new BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_INT_ARGB);
 		Graphics2D bGr = bimage.createGraphics();
 		bGr.drawImage(image, 0, 0, null);
 		bGr.dispose();
@@ -123,7 +98,23 @@ public class Board {
 				this.map[(width * y) + (x)] = true;
 			}
 		}
+	}
+	
+	public void fillTopLeftSquare(int l) {
+		int middleX = l/2;
+		int middleY = l/2;
 		
+		for(int y=middleY-l/2;y<middleY+l/2;y++){
+			for(int x=middleX-l/2;x<middleX+l/2;x++){
+				this.map[(width * y) + (x)] = true;
+			}
+		}
+	}
+
+	public void clear() {
+		for(int i=0;i<this.map.length;i++){
+			this.map[i] = false;
+		}
 	}
 
 }

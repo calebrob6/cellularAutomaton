@@ -1,12 +1,17 @@
 package cellularAutomaton;
 
+import java.util.Arrays;
+import java.util.HashMap;
+
 public class Main {
+	
+	private static HashMap<Integer, Boolean> cycleMap = new HashMap<Integer,Boolean>();
 
 	public static void main(String[] args) {
 
 		long start = System.currentTimeMillis();
 		
-		if(args.length<3){
+		if(args.length<4){
 			System.out.println("Usage:./thisProgram width height 'ruleString'");
 			return;
 		}
@@ -32,6 +37,8 @@ public class Main {
 			ruleStringIndex = Integer.parseInt(args[2]);
 		}
 		
+		int numCycles = Integer.parseInt(args[3]);
+		
 		boolean stopFlickering = false;
 		Board currentState = new Board(width, height);
 		Rules rules = new Rules();
@@ -53,14 +60,24 @@ public class Main {
 		int currentFrame = 0;
 		int currentOffset = 0;
 		boolean backwards = false;
-
+		boolean cycleFound = false;
+		int cycleLength = 0;
 		boolean running = true;
 
-		while (currentFrame < 1000) {
+		while (currentFrame < numCycles) {
 			long startTime = System.currentTimeMillis();
 			
 			if(currentFrame%100==0){
 				currentState.writeMapToImage("state"+currentFrame+".png");
+			}
+			
+
+			if(cycleMap.containsKey(Arrays.deepHashCode(currentState.map))){
+				cycleFound = true;
+				cycleMap.put(Arrays.deepHashCode(currentState.map), true);
+			}else if(!cycleFound){
+				cycleMap.put(Arrays.deepHashCode(currentState.map), true);
+				cycleLength++;
 			}
 
 			if (stopFlickering) {
@@ -138,6 +155,7 @@ public class Main {
 		currentState.writeMapToImage("final.png");
 		//System.out.println(currentState.calculateEntropy());
 		System.out.println(String.format("Done in %d seconds",System.currentTimeMillis()-start));
+		System.out.println("Cycle length: "+ cycleLength);
 	}
 
 	private static void updateFrameCount() {
