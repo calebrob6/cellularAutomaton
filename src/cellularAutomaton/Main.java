@@ -12,7 +12,7 @@ public class Main {
 	public static void main(String[] args) {
 		
 		if(args.length<4){
-			System.out.println("Usage:./thisProgram width height ruleStringIndex numIterations initialRandomPercent outputFn");
+			System.out.println("Usage:./thisProgram width height ruleStringIndex numIterations initialRandomPercent numExperiments outputFn");
 			return;
 		}
 		
@@ -23,9 +23,9 @@ public class Main {
 		int numIterations = Integer.parseInt(args[3]);
 		Double initialRandomPercent = Double.parseDouble(args[4]);
 		
-		String resultsFn = args[5];
+		String resultsFn = args[6];
 		
-		int numExperiments = 500;
+		int numExperiments = Integer.parseInt(args[5]);
 		
 		ArrayList<ExperimentalResults> results = new ArrayList<ExperimentalResults>();
 		
