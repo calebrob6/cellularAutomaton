@@ -1,0 +1,5 @@
+./src/cellularAutomaton/MargolusSimulation.java
+./src/cellularAutomaton/ExperimentalResults.java
+./src/cellularAutomaton/Board.java
+./src/cellularAutomaton/Main.java
+./src/cellularAutomaton/Rules.java
