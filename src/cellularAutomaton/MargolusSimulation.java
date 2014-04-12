@@ -8,19 +8,19 @@ public class MargolusSimulation {
 	private int width = -1;
 	private int height = -1;
 	private String ruleString = null;
-	private int numCycles = -1;
+	private int numIterations = -1;
 	
 	private Rules rules;
 	private Board board;
 	private double initialRandomPercent;
 	
-	public MargolusSimulation(int width, int height, String ruleString, int numCycles){
+	public MargolusSimulation(int width, int height, String ruleString, int numIterations){
 		
 		
 		this.width = width;
 		this.height = height;
 		this.ruleString = ruleString;
-		this.numCycles = numCycles;
+		this.numIterations = numIterations;
 		
 		this.rules = new Rules(ruleString);
 		this.board = new Board(width, height);
@@ -48,7 +48,7 @@ public class MargolusSimulation {
 		
 		long start = System.currentTimeMillis();
 
-		while (currentFrame < numCycles) {
+		while (currentFrame < numIterations) {
 			
 			long startTime = System.currentTimeMillis();
 			
@@ -105,7 +105,7 @@ public class MargolusSimulation {
 			long diff = end - startTime;
 
 			currentFrame++;
-			System.out.println(currentFrame + " " + diff1 + "/" + diff);
+			//System.out.println(currentFrame + " " + diff1 + "/" + diff);
 		}
 		
 		experiment.timeTaken = System.currentTimeMillis() - start;

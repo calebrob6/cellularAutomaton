@@ -26,5 +26,11 @@ public class ExperimentalResults {
 		retString += "Initital Random Percent: "+initialRandomPercent+"%\n";
 		return retString;
 	}
+	
+	public String toDelimitedRow(String separator){
+		String retString = "";
+		retString+=numFrames+separator+timeTaken+separator+cycleFound+separator+(cycleFound?cycleLength:"")+separator+initialRandomPercent;
+		return retString;
+	}
 
 }
