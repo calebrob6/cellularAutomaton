@@ -40,7 +40,7 @@ public class Main {
 		
 		
 		try {
-			PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(resultsFn, true)));
+			PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(resultsFn, false)));
 			for (ExperimentalResults r : results) {
 				out.println(r.toDelimitedRow(","));
 			}

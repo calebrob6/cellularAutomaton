@@ -20,22 +20,21 @@ import org.jgap.xml.XMLDocumentBuilder;
 import org.jgap.xml.XMLManager;
 import org.w3c.dom.Document;
 
-
 public class GATest {
 
 	public static void main(String[] args) {
 
 		try {
-			makeChangeForAmount(153, true);
+			makeChangeForAmount(251, true);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 	}
-	
+
 	private static final int MAX_ALLOWED_EVOLUTIONS = 50;
 
-	  public static EvolutionMonitor m_monitor;
+	public static EvolutionMonitor m_monitor;
 
 	public static void makeChangeForAmount(int a_targetChangeAmount,
 			boolean a_doMonitor) throws Exception {
@@ -54,8 +53,7 @@ public class GATest {
 		// MinimizingMakeChangeFitnessFunction. We construct it with
 		// the target amount of change passed in to this method.
 		// ---------------------------------------------------------
-		FitnessFunction myFunc = new GAFitness(
-				a_targetChangeAmount);
+		FitnessFunction myFunc = new GAFitness(a_targetChangeAmount);
 		conf.setFitnessFunction(myFunc);
 		if (a_doMonitor) {
 			// Turn on monitoring/auditing of evolution progress.
@@ -147,37 +145,35 @@ public class GATest {
 		bestSolutionSoFar.setFitnessValueDirectly(-1);
 		System.out.println("It contains the following: ");
 		System.out.println("\t"
-				+ GAFitness.getNumberOfCoinsAtGene(
-						bestSolutionSoFar, 0) + " quarters.");
+				+ GAFitness.getNumberOfCoinsAtGene(bestSolutionSoFar, 0)
+				+ " quarters.");
 		System.out.println("\t"
-				+ GAFitness.getNumberOfCoinsAtGene(
-						bestSolutionSoFar, 1) + " dimes.");
+				+ GAFitness.getNumberOfCoinsAtGene(bestSolutionSoFar, 1)
+				+ " dimes.");
 		System.out.println("\t"
-				+ GAFitness.getNumberOfCoinsAtGene(
-						bestSolutionSoFar, 2) + " nickels.");
+				+ GAFitness.getNumberOfCoinsAtGene(bestSolutionSoFar, 2)
+				+ " nickels.");
 		System.out.println("\t"
-				+ GAFitness.getNumberOfCoinsAtGene(
-						bestSolutionSoFar, 3) + " pennies.");
+				+ GAFitness.getNumberOfCoinsAtGene(bestSolutionSoFar, 3)
+				+ " pennies.");
 		System.out.println("For a total of "
-				+ GAFitness
-						.amountOfChange(bestSolutionSoFar)
-				+ " cents in "
-				+ GAFitness
-						.getTotalNumberOfCoins(bestSolutionSoFar) + " coins.");
+				+ GAFitness.amountOfChange(bestSolutionSoFar) + " cents in "
+				+ GAFitness.getTotalNumberOfCoins(bestSolutionSoFar)
+				+ " coins.");
 	}
-	
+
 	public static boolean uniqueChromosomes(Population a_pop) {
-	    // Check that all chromosomes are unique
-	    for(int i=0;i<a_pop.size()-1;i++) {
-	      IChromosome c = a_pop.getChromosome(i);
-	      for(int j=i+1;j<a_pop.size();j++) {
-	        IChromosome c2 =a_pop.getChromosome(j);
-	        if (c == c2) {
-	          return false;
-	        }
-	      }
-	    }
-	    return true;
-	  }
+		// Check that all chromosomes are unique
+		for (int i = 0; i < a_pop.size() - 1; i++) {
+			IChromosome c = a_pop.getChromosome(i);
+			for (int j = i + 1; j < a_pop.size(); j++) {
+				IChromosome c2 = a_pop.getChromosome(j);
+				if (c == c2) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
 
 }
