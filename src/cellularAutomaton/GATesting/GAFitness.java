@@ -3,168 +3,48 @@ package cellularAutomaton.GATesting;
 import org.jgap.FitnessFunction;
 import org.jgap.IChromosome;
 
+import cellularAutomaton.ExperimentalResults;
+import cellularAutomaton.MargolusSimulation;
+
 public class GAFitness extends FitnessFunction {
 
-	/** String containing the CVS revision. Read out via reflection! */
-	private final static String CVS_REVISION = "$Revision: 1.18 $";
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	public final int width;
+	public final int height;
+	public final double initialRandomPercent;
+	public final int numIterations;
 
-	private final int m_targetAmount;
-
-	public static final int MAX_BOUND = 4000;
-
-	public GAFitness(int a_targetAmount) {
-		if (a_targetAmount < 1 || a_targetAmount >= MAX_BOUND) {
-			throw new IllegalArgumentException(
-					"Change amount must be between 1 and " + MAX_BOUND
-							+ " cents.");
-		}
-		m_targetAmount = a_targetAmount;
+	public GAFitness(int maxIterations, int width, int height, double initialRandomPercent) {
+		this.width = width;
+		this.height = height;
+		this.initialRandomPercent = initialRandomPercent;
+		this.numIterations = maxIterations;
 	}
 
-	/**
-	 * Determine the fitness of the given Chromosome instance. The higher the
-	 * return value, the more fit the instance. This method should always return
-	 * the same fitness value for two equivalent Chromosome instances.
-	 * 
-	 * @param a_subject
-	 *            the Chromosome instance to evaluate
-	 * 
-	 * @return positive double reflecting the fitness rating of the given
-	 *         Chromosome
-	 * @since 2.0 (until 1.1: return type int)
-	 * @author Neil Rotstan, Klaus Meffert, John Serri
-	 */
-	public double evaluate(IChromosome a_subject) {
-
-
-		int changeAmount = amountOfChange(a_subject);
-		int totalCoins = getTotalNumberOfCoins(a_subject);
-		int changeDifference = Math.abs(m_targetAmount - changeAmount);
-		
-		double fitness;
-
-		fitness = 0.0d;
-		fitness += changeDifferenceBonus(MAX_BOUND / 2, changeDifference);
-		fitness -= computeCoinNumberPenalty(MAX_BOUND / 2, totalCoins);
 	
+	public double evaluate(IChromosome a_subject) {
+		
+		//higher fitness is better
+		
+		double fitness = 1.0d;
+		String rule = "";
+		for(int i=0;i<GATest.NUM_RULE_GENES;i++){
+			rule += ((Integer)a_subject.getGene(i).getAllele()).intValue() + ((i!=GATest.NUM_RULE_GENES-1)?";":"");
+		}
+		
+		MargolusSimulation sim = new MargolusSimulation(width, height, rule, numIterations);
+		sim.setInitialConstrainedRandom(initialRandomPercent);
+		ExperimentalResults result = sim.runExperiment();
+		
+		fitness = result.cycleLength;
+		
 		return Math.max(1.0d, fitness);
 	}
 
-	/**
-	 * Bonus calculation of fitness value.
-	 * 
-	 * @param a_maxFitness
-	 *            maximum fitness value appliable
-	 * @param a_changeDifference
-	 *            change difference in coins for the coins problem
-	 * @return bonus for given change difference
-	 * 
-	 * @author Klaus Meffert
-	 * @since 2.3
-	 */
-	protected double changeDifferenceBonus(double a_maxFitness,
-			int a_changeDifference) {
-		if (a_changeDifference == 0) {
-			return a_maxFitness;
-		} else {
-			// we arbitrarily work with half of the maximum fitness as basis for
-			// non-
-			// optimal solutions (concerning change difference)
-			if (a_changeDifference * a_changeDifference >= a_maxFitness / 2) {
-				return 0.0d;
-			} else {
-				return a_maxFitness / 2 - a_changeDifference
-						* a_changeDifference;
-			}
-		}
-	}
-
-	/**
-	 * Calculates the penalty to apply to the fitness value based on the ammount
-	 * of coins in the solution
-	 * 
-	 * @param a_maxFitness
-	 *            maximum fitness value allowed
-	 * @param a_coins
-	 *            number of coins in the solution
-	 * @return penalty for the fitness value base on the number of coins
-	 * 
-	 * @author John Serri
-	 * @since 2.2
-	 */
-	protected double computeCoinNumberPenalty(double a_maxFitness, int a_coins) {
-		if (a_coins == 1) {
-			// we know the solution cannot have less than one coin
-			return 0;
-		} else {
-			// The more coins the more penalty, but not more than the maximum
-			// fitness
-			// value possible. Let's avoid linear behavior and use
-			// exponential penalty calculation instead
-			return (Math.min(a_maxFitness, a_coins * a_coins));
-		}
-	}
-
-	/**
-	 * Calculates the total amount of change (in cents) represented by the given
-	 * potential solution and returns that amount.
-	 * 
-	 * @param a_potentialSolution
-	 *            the potential solution to evaluate
-	 * @return The total amount of change (in cents) represented by the given
-	 *         solution
-	 * 
-	 * @author Neil Rotstan
-	 * @since 1.0
-	 */
-	public static int amountOfChange(IChromosome a_potentialSolution) {
-		int numQuarters = getNumberOfCoinsAtGene(a_potentialSolution, 0);
-		int numDimes = getNumberOfCoinsAtGene(a_potentialSolution, 1);
-		int numNickels = getNumberOfCoinsAtGene(a_potentialSolution, 2);
-		int numPennies = getNumberOfCoinsAtGene(a_potentialSolution, 3);
-		return (numQuarters * 25) + (numDimes * 10) + (numNickels * 5)
-				+ numPennies;
-	}
-
-	/**
-	 * Retrieves the number of coins represented by the given potential solution
-	 * at the given gene position.
-	 * 
-	 * @param a_potentialSolution
-	 *            the potential solution to evaluate
-	 * @param a_position
-	 *            the gene position to evaluate
-	 * @return the number of coins represented by the potential solution at the
-	 *         given gene position
-	 * 
-	 * @author Neil Rotstan
-	 * @since 1.0
-	 */
-	public static int getNumberOfCoinsAtGene(IChromosome a_potentialSolution,
-			int a_position) {
-		Integer numCoins = (Integer) a_potentialSolution.getGene(a_position)
-				.getAllele();
-		return numCoins.intValue();
-	}
-
-	/**
-	 * Returns the total number of coins represented by all of the genes in the
-	 * given potential solution.
-	 * 
-	 * @param a_potentialsolution
-	 *            the potential solution to evaluate
-	 * @return total number of coins represented by the given Chromosome
-	 * 
-	 * @author Neil Rotstan
-	 * @since 1.0
-	 */
-	public static int getTotalNumberOfCoins(IChromosome a_potentialsolution) {
-		int totalCoins = 0;
-		int numberOfGenes = a_potentialsolution.size();
-		for (int i = 0; i < numberOfGenes; i++) {
-			totalCoins += getNumberOfCoinsAtGene(a_potentialsolution, i);
-		}
-		return totalCoins;
-	}
 
 }

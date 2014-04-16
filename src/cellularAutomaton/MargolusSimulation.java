@@ -36,6 +36,12 @@ public class MargolusSimulation {
 
 	}
 	
+	public void setInitialConstrainedRandom(double percent){
+		this.initialRandomPercent = percent;
+		this.board.clear();
+		this.board.fillRandomConstrainedPercent(percent);
+	}
+	
 	public ExperimentalResults runExperiment(){
 		ExperimentalResults experiment = new ExperimentalResults();
 		
