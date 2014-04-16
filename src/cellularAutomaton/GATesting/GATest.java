@@ -1,8 +1,5 @@
 package cellularAutomaton.GATesting;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-
 import org.jgap.Chromosome;
 import org.jgap.Configuration;
 import org.jgap.FitnessFunction;
@@ -10,22 +7,27 @@ import org.jgap.Gene;
 import org.jgap.Genotype;
 import org.jgap.IChromosome;
 import org.jgap.Population;
-import org.jgap.UnsupportedRepresentationException;
 import org.jgap.audit.EvolutionMonitor;
-import org.jgap.data.DataTreeBuilder;
-import org.jgap.data.IDataCreators;
 import org.jgap.impl.DefaultConfiguration;
 import org.jgap.impl.IntegerGene;
-import org.jgap.xml.XMLDocumentBuilder;
-import org.jgap.xml.XMLManager;
-import org.w3c.dom.Document;
 
 public class GATest {
 
 	public static void main(String[] args) {
 
 		try {
-			makeChangeForAmount(251, true);
+			
+			if(args.length<4){
+				System.out.println("Usage:./program width height maxIterations initialRandomPercent");
+				return;
+			}
+			
+			int maxIterations = Integer.parseInt(args[2]);
+			int width = Integer.parseInt(args[0]);
+			int height = Integer.parseInt(args[1]);
+			double initialRandomPercent = Double.parseDouble(args[3]);
+			
+			runExperiment(true, maxIterations, width, height, initialRandomPercent);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -34,31 +36,22 @@ public class GATest {
 
 	private static final int MAX_ALLOWED_EVOLUTIONS = 50;
 
+	public static final int NUM_RULE_GENES = 16;
+
 	public static EvolutionMonitor m_monitor;
 
-	public static void makeChangeForAmount(int a_targetChangeAmount, boolean a_doMonitor) throws Exception {
+	public static void runExperiment(boolean a_doMonitor, int maxIterations, int width, int height, double initialRandomPercent) throws Exception {
 
 		Configuration conf = new DefaultConfiguration();
 		conf.setPreservFittestIndividual(true);
 		conf.setKeepPopulationSizeConstant(false);
-		FitnessFunction myFunc = new GAFitness(a_targetChangeAmount);
+		FitnessFunction myFunc = new GAFitness(maxIterations, width, height, initialRandomPercent);
 		conf.setFitnessFunction(myFunc);
 		if (a_doMonitor) {
 			m_monitor = new EvolutionMonitor();
 			conf.setMonitor(m_monitor);
 		}
 		
-		// Now we need to tell the Configuration object how we want our
-		// Chromosomes to be setup. We do that by actually creating a
-		// sample Chromosome and then setting it on the Configuration
-		// object. As mentioned earlier, we want our Chromosomes to each
-		// have four genes, one for each of the coin types. We want the
-		// values (alleles) of those genes to be integers, which represent
-		// how many coins of that type we have. We therefore use the
-		// IntegerGene class to represent each of the genes. That class
-		// also lets us specify a lower and upper bound, which we set
-		// to sensible values for each coin type.
-		// --------------------------------------------------------------
 		
 		Gene[] sampleGenes = new Gene[16];
 		for(int i=0;i<16;i++){
@@ -67,8 +60,6 @@ public class GATest {
 		//sampleGenes[16] = new IntegerGene(conf, 0, 10000); // Number of iterations
 		//sampleGenes[17] = new IntegerGene(conf, 0, 50); // width
 		//sampleGenes[18] = new IntegerGene(conf, 0, 50); // height
-		
-		
 		
 		IChromosome sampleChromosome = new Chromosome(conf, sampleGenes);
 		
@@ -91,6 +82,7 @@ public class GATest {
 
 		long startTime = System.currentTimeMillis();
 		for (int i = 0; i < MAX_ALLOWED_EVOLUTIONS; i++) {
+			System.out.println((i+1)+"/"+MAX_ALLOWED_EVOLUTIONS);
 			if (!uniqueChromosomes(population.getPopulation())) {
 				throw new RuntimeException("Invalid state in generation " + i);
 			}
@@ -104,8 +96,6 @@ public class GATest {
 		System.out.println("Total evolution time: " + (endTime - startTime) + " ms");
 		
 		/*
-		// Save progress to file. A new run of this example will then be able to
-		// resume where it stopped before! --> this is completely optional.
 		DataTreeBuilder builder = DataTreeBuilder.getInstance();
 		IDataCreators doc2 = builder.representGenotypeAsDocument(population);
 		XMLDocumentBuilder docbuilder = new XMLDocumentBuilder();
@@ -120,7 +110,7 @@ public class GATest {
 		//bestSolutionSoFar.setFitnessValueDirectly(-1);
 		System.out.println("Rule string: ");
 		for(int i=0;i<16;i++){
-			System.out.println(((Integer)bestSolutionSoFar.getGene(i).getAllele()).intValue() + ";");
+			System.out.print(((Integer)bestSolutionSoFar.getGene(i).getAllele()).intValue() + ";");
 		}
 		
 	}

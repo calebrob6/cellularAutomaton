@@ -20,7 +20,6 @@ public class Board {
 	public int height = 0;
 	public Boolean[] map;
 
-	private boolean currentOffset = false;
 
 	public Board(int width, int height) {
 		this.width = width;
@@ -41,7 +40,17 @@ public class Board {
 		for(int i=0;i<numPixels;i++){
 			this.map[(width * rand.nextInt(height)) + (rand.nextInt(width))] = true;
 		}
-		
+	}
+	
+	public void fillRandomConstrainedPercent(double percent){
+		long size = width * height;
+		long numPixels = Math.round(size*(percent/100l));
+	
+		Random rand = new Random();
+
+		for(int i=0;i<numPixels;i++){
+			this.map[(width * rand.nextInt(height/4)) + (rand.nextInt(width/4))] = true;
+		}
 	}
 	
 	public void writeMapToImage(String fn){
