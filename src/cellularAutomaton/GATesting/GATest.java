@@ -1,5 +1,10 @@
 package cellularAutomaton.GATesting;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+
 import org.jgap.Chromosome;
 import org.jgap.Configuration;
 import org.jgap.FitnessFunction;
@@ -109,8 +114,24 @@ public class GATest {
 		System.out.println("The best solution has a fitness value of " + v1);
 		//bestSolutionSoFar.setFitnessValueDirectly(-1);
 		System.out.println("Rule string: ");
-		for(int i=0;i<16;i++){
+		String resultString = "";
+		for(int i=0;i<GATest.NUM_RULE_GENES;i++){
 			System.out.print(((Integer)bestSolutionSoFar.getGene(i).getAllele()).intValue() + ";");
+			resultString += ((Integer)bestSolutionSoFar.getGene(i).getAllele()).intValue() + ((i!=GATest.NUM_RULE_GENES-1)?";":"");
+		}
+		
+		try {
+			File file = new File(System.currentTimeMillis()+"results.txt");
+			if (!file.exists()) {
+				file.createNewFile();
+			}
+			FileWriter fw = new FileWriter(file.getAbsoluteFile());
+			BufferedWriter bw = new BufferedWriter(fw);
+			bw.write(v1+"\n");
+			bw.write(resultString);
+			bw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 		
 	}
