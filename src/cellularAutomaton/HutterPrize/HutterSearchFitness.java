@@ -24,7 +24,7 @@ public class HutterSearchFitness extends FitnessFunction {
 	public final int width;
 	public final int height;
 	public final double initialRandomPercent;
-	public final int numIterations;
+	public int numIterations;
 
 	public static byte[] buffer;
 
@@ -40,11 +40,10 @@ public class HutterSearchFitness extends FitnessFunction {
 		}
 	}
 
-	public HutterSearchFitness(int maxIterations, int width, int height, double initialRandomPercent) {
+	public HutterSearchFitness(int width, int height, double initialRandomPercent) {
 		this.width = width;
 		this.height = height;
 		this.initialRandomPercent = initialRandomPercent;
-		this.numIterations = maxIterations;
 	}
 
 	public double evaluate(IChromosome a_subject) {
@@ -57,6 +56,7 @@ public class HutterSearchFitness extends FitnessFunction {
 		for (int i = 0; i < HutterSearch.NUM_RULE_GENES; i++) {
 			rule += ((Integer) a_subject.getGene(i).getAllele()).intValue() + ((i != HutterSearch.NUM_RULE_GENES - 1) ? ";" : "");
 		}
+		numIterations = ((Integer) a_subject.getGene(HutterSearch.NUM_RULE_GENES).getAllele());
 
 		MargolusSimulation sim = new MargolusSimulation(width, height, rule, numIterations);
 		sim.setInitialConstrainedRandom(initialRandomPercent,5);

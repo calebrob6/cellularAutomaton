@@ -44,6 +44,7 @@ public class MargolusSimulation {
 	
 	public ExperimentalResults runExperiment(){
 		ExperimentalResults experiment = new ExperimentalResults();
+		experiment.initialBoard = this.board.toByteArray();
 		
 		HashMap<Integer, Boolean> cycleMap = new HashMap<Integer,Boolean>();
 		int currentFrame = 0;
@@ -66,7 +67,6 @@ public class MargolusSimulation {
 				cycleMap.put(Arrays.hashCode(this.board.map), true);
 				cycleLength++;
 			}
-				
 
 
 			long start1 = System.currentTimeMillis();
@@ -113,6 +113,7 @@ public class MargolusSimulation {
 			currentFrame++;
 			//System.out.println(currentFrame + " " + diff1 + "/" + diff);
 		}
+		
 		
 		experiment.timeTaken = System.currentTimeMillis() - start;
 		experiment.numFrames = currentFrame;

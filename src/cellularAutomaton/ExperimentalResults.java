@@ -9,6 +9,7 @@ public class ExperimentalResults {
 	public boolean cycleFound;
 	public double initialRandomPercent;
 	public Board finalBoard;
+	public byte[] initialBoard;
 	
 	public ExperimentalResults(){
 		

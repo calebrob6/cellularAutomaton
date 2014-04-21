@@ -23,18 +23,13 @@ public class HutterSearch {
 		try {
 			
 			
-			if(args.length<4){
-				System.out.println("Usage:./program width height maxIterations initialRandomPercent");
+			if(args.length<1){
+				System.out.println("Usage:./program initialRandomPercent");
 				return;
 			}
 			
-			int maxIterations = Integer.parseInt(args[2]);
-			int width = Integer.parseInt(args[0]);
-			int height = Integer.parseInt(args[1]);
-			double initialRandomPercent = Double.parseDouble(args[3]);
-			
-			//need atleast 44194 iterations
-			runExperiment(true, maxIterations, 25600, 31250, initialRandomPercent);
+			double initialRandomPercent = Double.parseDouble(args[0]);
+			runExperiment(true, initialRandomPercent);
 
 			
 		} catch (Exception e) {
@@ -48,7 +43,7 @@ public class HutterSearch {
 
 	public static EvolutionMonitor m_monitor;
 
-	public static void runExperiment(boolean a_doMonitor, int maxIterations, int width, int height, double initialRandomPercent) throws Exception {
+	public static void runExperiment(boolean a_doMonitor, double initialRandomPercent) throws Exception {
 
 		HutterSearchFitness.loadHutterFile("enwik8");
 
@@ -56,7 +51,7 @@ public class HutterSearch {
 		Configuration conf = new DefaultConfiguration();
 		conf.setPreservFittestIndividual(true);
 		conf.setKeepPopulationSizeConstant(false);
-		FitnessFunction myFunc = new HutterSearchFitness(maxIterations, width, height, initialRandomPercent);
+		FitnessFunction myFunc = new HutterSearchFitness(25600, 31250, initialRandomPercent);
 		conf.setFitnessFunction(myFunc);
 		if (a_doMonitor) {
 			m_monitor = new EvolutionMonitor();
@@ -64,11 +59,11 @@ public class HutterSearch {
 		}
 		
 		
-		Gene[] sampleGenes = new Gene[16];
-		for(int i=0;i<16;i++){
+		Gene[] sampleGenes = new Gene[HutterSearch.NUM_RULE_GENES+1];
+		for(int i=0;i<HutterSearch.NUM_RULE_GENES;i++){
 			sampleGenes[i] = new IntegerGene(conf,0,15);
 		}
-		//sampleGenes[16] = new IntegerGene(conf, 0, 10000); // Number of iterations
+		sampleGenes[HutterSearch.NUM_RULE_GENES] = new IntegerGene(conf, 0, 100000); // Number of iterations
 		//sampleGenes[17] = new IntegerGene(conf, 0, 50); // width
 		//sampleGenes[18] = new IntegerGene(conf, 0, 50); // height
 		
@@ -106,6 +101,7 @@ public class HutterSearch {
 			System.out.print(((Integer)bestSolutionSoFar.getGene(i).getAllele()).intValue() + ";");
 			resultString += ((Integer)bestSolutionSoFar.getGene(i).getAllele()).intValue() + ((i!=HutterSearch.NUM_RULE_GENES-1)?";":"");
 		}
+		int numIterations = ((Integer) bestSolutionSoFar.getGene(HutterSearch.NUM_RULE_GENES).getAllele());
 		
 		try {
 			File file = new File(System.currentTimeMillis()+"results.txt");
@@ -116,7 +112,8 @@ public class HutterSearch {
 			BufferedWriter bw = new BufferedWriter(fw);
 			bw.write(initialBestFitness+"\n");
 			bw.write(finalBestFitness+"\n");
-			bw.write(resultString);
+			bw.write(resultString+"\n");
+			bw.write(numIterations);
 			bw.close();
 		} catch (IOException e) {
 			e.printStackTrace();
