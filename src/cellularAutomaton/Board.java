@@ -42,14 +42,14 @@ public class Board {
 		}
 	}
 	
-	public void fillRandomConstrainedPercent(double percent){
+	public void fillRandomConstrainedPercent(double percent,int areaDivisor){
 		long size = width * height;
 		long numPixels = Math.round(size*(percent/100l));
 	
 		Random rand = new Random();
 
 		for(int i=0;i<numPixels;i++){
-			this.map[(width * rand.nextInt(height/4)) + (rand.nextInt(width/4))] = true;
+			this.map[(width * rand.nextInt(height/areaDivisor)) + (rand.nextInt(width/areaDivisor))] = true;
 		}
 	}
 	
@@ -130,6 +130,23 @@ public class Board {
 		for(int i=0;i<this.map.length;i++){
 			this.map[i] = false;
 		}
+	}
+	
+	public byte[] toByteArray(){
+		byte[] resultFile = new byte[map.length/8];
+		for(int i=0;i<resultFile.length;i++){
+			byte rB = 0x00;
+			rB |= (map[i*8] ? 1 : 0) << 7;
+			rB |= (map[i*8+1] ? 1 : 0) << 6;
+			rB |= (map[i*8+2] ? 1 : 0) << 5;
+			rB |= (map[i*8+3] ? 1 : 0) << 4;
+			rB |= (map[i*8+4] ? 1 : 0) << 3;
+			rB |= (map[i*8+5] ? 1 : 0) << 2;
+			rB |= (map[i*8+6] ? 1 : 0) << 1;
+			rB |= (map[i*8+7] ? 1 : 0);
+			resultFile[i] = rB;
+		}
+		return resultFile;
 	}
 
 }

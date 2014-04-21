@@ -8,6 +8,7 @@ public class ExperimentalResults {
 	public int numFrames;
 	public boolean cycleFound;
 	public double initialRandomPercent;
+	public Board finalBoard;
 	
 	public ExperimentalResults(){
 		

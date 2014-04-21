@@ -36,10 +36,10 @@ public class MargolusSimulation {
 
 	}
 	
-	public void setInitialConstrainedRandom(double percent){
+	public void setInitialConstrainedRandom(double percent, int areaDivisor) {
 		this.initialRandomPercent = percent;
 		this.board.clear();
-		this.board.fillRandomConstrainedPercent(percent);
+		this.board.fillRandomConstrainedPercent(percent, areaDivisor);
 	}
 	
 	public ExperimentalResults runExperiment(){
@@ -119,6 +119,7 @@ public class MargolusSimulation {
 		experiment.cycleLength = cycleLength;
 		experiment.cycleFound = cycleFound;
 		experiment.initialRandomPercent = initialRandomPercent;
+		experiment.finalBoard = this.board;
 		
 		return experiment;
 	}

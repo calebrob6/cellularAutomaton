@@ -38,7 +38,7 @@ public class GAFitness extends FitnessFunction {
 		}
 		
 		MargolusSimulation sim = new MargolusSimulation(width, height, rule, numIterations);
-		sim.setInitialConstrainedRandom(initialRandomPercent);
+		sim.setInitialConstrainedRandom(initialRandomPercent,4);
 		ExperimentalResults result = sim.runExperiment();
 		
 		fitness = result.cycleLength;
