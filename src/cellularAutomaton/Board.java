@@ -42,6 +42,7 @@ public class Board {
 		}
 	}
 	
+
 	public void fillRandomConstrainedPercent(double percent,int areaDivisor){
 		long size = width * height;
 		long numPixels = Math.round(size*(percent/100l));
@@ -131,6 +132,7 @@ public class Board {
 			this.map[i] = false;
 		}
 	}
+<<<<<<< HEAD
 	
 	public byte[] toByteArray(){
 		byte[] resultFile = new byte[map.length/8];
@@ -148,5 +150,7 @@ public class Board {
 		}
 		return resultFile;
 	}
+=======
+>>>>>>> e03bf1ff7499434082d4a90bc30392f25de5ccd5
 
 }
