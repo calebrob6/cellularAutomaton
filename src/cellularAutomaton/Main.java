@@ -31,7 +31,7 @@ public class Main {
 		
 		for(int i=0;i<numExperiments;i++){
 			System.out.println(i+"/"+numExperiments);
-			MargolusSimulation sim = new MargolusSimulation(width, height, Rules.ruleSets[ruleIndex], numIterations);
+			MargolusSimulation sim = new MargolusSimulation(width, height, Rules.ruleSets[ruleIndex], numIterations, true);
 			sim.setInitialRandom(initialRandomPercent);
 			ExperimentalResults result = sim.runExperiment();
 			

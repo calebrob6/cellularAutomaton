@@ -73,9 +73,9 @@ public class HutterSearch {
 		conf.setPopulationSize(20);
 		
 		Genotype population = Genotype.randomInitialGenotype(conf);
-		
+		System.out.println("About to get the fittest individual");
 		double initialBestFitness = population.getFittestChromosome().getFitnessValue();
-
+		System.out.println("Initial best fitness " + initialBestFitness);
 		long startTime = System.currentTimeMillis();
 		for (int i = 0; i < MAX_ALLOWED_EVOLUTIONS; i++) {
 			System.out.println((i+1)+"/"+MAX_ALLOWED_EVOLUTIONS);

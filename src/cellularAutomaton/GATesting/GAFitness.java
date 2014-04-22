@@ -37,7 +37,7 @@ public class GAFitness extends FitnessFunction {
 			rule += ((Integer)a_subject.getGene(i).getAllele()).intValue() + ((i!=GATest.NUM_RULE_GENES-1)?";":"");
 		}
 		
-		MargolusSimulation sim = new MargolusSimulation(width, height, rule, numIterations);
+		MargolusSimulation sim = new MargolusSimulation(width, height, rule, numIterations, true);
 		sim.setInitialConstrainedRandom(initialRandomPercent,4);
 		ExperimentalResults result = sim.runExperiment();
 		

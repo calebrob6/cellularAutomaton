@@ -13,8 +13,9 @@ public class MargolusSimulation {
 	private Rules rules;
 	private Board board;
 	private double initialRandomPercent;
+	private boolean hashing;
 	
-	public MargolusSimulation(int width, int height, String ruleString, int numIterations){
+	public MargolusSimulation(int width, int height, String ruleString, int numIterations,boolean hashing){
 		
 		
 		this.width = width;
@@ -26,6 +27,8 @@ public class MargolusSimulation {
 		this.board = new Board(width, height);
 		
 		this.initialRandomPercent = (double) 0;
+		
+		this.hashing = hashing;
 		
 	}
 	
@@ -56,18 +59,20 @@ public class MargolusSimulation {
 		long start = System.currentTimeMillis();
 
 		while (currentFrame < numIterations) {
-			
+			if(currentFrame%1==0){
+				System.out.println(currentFrame+"/"+numIterations);
+			}
 			long startTime = System.currentTimeMillis();
 			
-			
-			if(cycleMap.containsKey(Arrays.hashCode(this.board.map))){
-				cycleFound = true;
-				cycleMap.put(Arrays.hashCode(this.board.map), true);
-			}else if(!cycleFound){
-				cycleMap.put(Arrays.hashCode(this.board.map), true);
-				cycleLength++;
+			if (hashing) {
+				if (cycleMap.containsKey(Arrays.hashCode(this.board.map))) {
+					cycleFound = true;
+					cycleMap.put(Arrays.hashCode(this.board.map), true);
+				} else if (!cycleFound) {
+					cycleMap.put(Arrays.hashCode(this.board.map), true);
+					cycleLength++;
+				}
 			}
-
 
 			long start1 = System.currentTimeMillis();
 			for (int i = 0; i < height; i += 2) {
@@ -103,7 +108,7 @@ public class MargolusSimulation {
 			}
 			long end1 = System.currentTimeMillis();
 			long diff1 = end1 - start1;
-
+			System.out.println(diff1);
 
 			currentOffset = (currentOffset == 0) ? 1 : 0;
 

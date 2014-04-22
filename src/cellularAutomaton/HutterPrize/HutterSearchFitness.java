@@ -57,11 +57,14 @@ public class HutterSearchFitness extends FitnessFunction {
 			rule += ((Integer) a_subject.getGene(i).getAllele()).intValue() + ((i != HutterSearch.NUM_RULE_GENES - 1) ? ";" : "");
 		}
 		numIterations = ((Integer) a_subject.getGene(HutterSearch.NUM_RULE_GENES).getAllele());
-
-		MargolusSimulation sim = new MargolusSimulation(width, height, rule, numIterations);
+		
+		System.out.println("Testing individual with rule: "+rule);
+		System.out.println("\tand numIterations: "+numIterations);
+		System.out.println("Running simulation...");
+		MargolusSimulation sim = new MargolusSimulation(width, height, rule, numIterations, false);
 		sim.setInitialConstrainedRandom(initialRandomPercent,5);
 		ExperimentalResults result = sim.runExperiment();
-		
+		System.out.println("Calculating fitness...");
 		for(int i=0;i<buffer.length;i++){
 
 			fitness -=  (((buffer[i] & 0X80) == 1) == result.finalBoard.map[i*8]) ? 0 : 1;
