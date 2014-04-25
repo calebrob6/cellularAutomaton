@@ -42,7 +42,7 @@ public class GASmallTest {
 			Random rand = new Random();
 			int maxCycle = 0;
 			String maxRule = "";
-			for(int i=0;i<1000000;i++){
+			for(long i=0;i<1000000000;i++){
 				if(i%10000==0){
 					System.out.println(i);
 				}
