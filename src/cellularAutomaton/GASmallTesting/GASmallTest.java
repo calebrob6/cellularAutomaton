@@ -4,6 +4,8 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Random;
 
 import org.jgap.Chromosome;
 import org.jgap.Configuration;
@@ -16,40 +18,74 @@ import org.jgap.audit.EvolutionMonitor;
 import org.jgap.impl.DefaultConfiguration;
 import org.jgap.impl.IntegerGene;
 
-import cellularAutomaton.HutterPrize.HutterSearch;
-import cellularAutomaton.HutterPrize.HutterSearchFitness;
+import cellularAutomaton.ExperimentalResults;
 
 public class GASmallTest {
 
 	public static void main(String[] args) {
 
+		
 		try {
 			
-			if(args.length<3){
-				System.out.println("Usage:./program width height initialRandomPercent");
+			if(args.length<4){
+				System.out.println("Usage:./thisProgram width height cWidth cHeight outputFn");
 				return;
 			}
+			
+			
 			int width = Integer.parseInt(args[0]);
-			double initialRandomPercent = Double.parseDouble(args[0]);
-			runExperiment(true, initialRandomPercent);
+			int height = Integer.parseInt(args[1]);
+			int cWidth = Integer.parseInt(args[2]);
+			int cHeight = Integer.parseInt(args[3]);
+			String outFn = args[4];
+			
+			Random rand = new Random();
+			int maxCycle = 0;
+			String maxRule = "";
+			for(int i=0;i<1000000;i++){
+				if(i%10000==0){
+					System.out.println(i);
+				}
+				String result = "";
+				for(int j=0;j<16;j++){
+					result+= Integer.toString(rand.nextInt(16))+((j!=15)?";":"");
+				}
+				SmallMargolusSimulation sim = new SmallMargolusSimulation(width, height, cWidth, cHeight, result);
+				ExperimentalResults results = sim.runExperiment();
+				if(results.cycleLength>maxCycle){
+					maxCycle = results.cycleLength;
+					maxRule = result;
+					System.out.println(maxCycle+ "  -  "+maxRule);
+					try {
+					    PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(outFn, true)));
+					    out.println(maxCycle+ "  -  "+maxRule);
+					    out.close();
+					} catch (IOException e) {
+					    e.printStackTrace();
+					}
+				}
+			}
+			
+			
+			//runExperiment(true);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 	}
 
-	private static final int MAX_ALLOWED_EVOLUTIONS = 100;
+	private static final int MAX_ALLOWED_EVOLUTIONS = 50;
 
 	public static final int NUM_RULE_GENES = 16;
 
 	public static EvolutionMonitor m_monitor;
 
-	public static void runExperiment(boolean a_doMonitor, double initialRandomPercent) throws Exception {
+	public static void runExperiment(boolean a_doMonitor) throws Exception {
 
 		Configuration conf = new DefaultConfiguration();
 		conf.setPreservFittestIndividual(true);
 		conf.setKeepPopulationSizeConstant(false);
-		FitnessFunction myFunc = new GASmallFitness(initialRandomPercent);
+		FitnessFunction myFunc = new GASmallFitness();
 		conf.setFitnessFunction(myFunc);
 		if (a_doMonitor) {
 			m_monitor = new EvolutionMonitor();
@@ -57,22 +93,19 @@ public class GASmallTest {
 		}
 		
 		
-		Gene[] sampleGenes = new Gene[NUM_RULE_GENES+2];
+		Gene[] sampleGenes = new Gene[NUM_RULE_GENES];
 		for(int i=0;i<NUM_RULE_GENES;i++){
 			sampleGenes[i] = new IntegerGene(conf,0,15);
 		}
-		sampleGenes[NUM_RULE_GENES] = new IntegerGene(conf, 5, 15); // width
-		sampleGenes[NUM_RULE_GENES+1] = new IntegerGene(conf, 5, 15); // height
+
 		
 		IChromosome sampleChromosome = new Chromosome(conf, sampleGenes);
 		
 		conf.setSampleChromosome(sampleChromosome);
-		conf.setPopulationSize(50);
+		conf.setPopulationSize(100);
 		
 		Genotype population = Genotype.randomInitialGenotype(conf);
-		System.out.println("About to get the fittest individual");
 		double initialBestFitness = population.getFittestChromosome().getFitnessValue();
-		System.out.println("Initial best fitness " + initialBestFitness);
 		
 		long startTime = System.currentTimeMillis();
 		for (int i = 0; i < MAX_ALLOWED_EVOLUTIONS; i++) {
@@ -99,9 +132,6 @@ public class GASmallTest {
 			System.out.print(((Integer)bestSolutionSoFar.getGene(i).getAllele()).intValue() + ";");
 			resultString += ((Integer)bestSolutionSoFar.getGene(i).getAllele()).intValue() + ((i!=NUM_RULE_GENES-1)?";":"");
 		}
-		int gWidth = ((Integer) bestSolutionSoFar.getGene(NUM_RULE_GENES).getAllele());
-		int gHeight = ((Integer) bestSolutionSoFar.getGene(NUM_RULE_GENES+1).getAllele());
-		System.out.println("On a board size of: "+gWidth+ ", "+gHeight);
 		
 		try {
 			File file = new File(System.currentTimeMillis()+"results.txt");
@@ -113,7 +143,6 @@ public class GASmallTest {
 			bw.write(initialBestFitness+"\n");
 			bw.write(finalBestFitness+"\n");
 			bw.write(resultString+"\n");
-			bw.write(gWidth+":"+gHeight);
 			bw.close();
 		} catch (IOException e) {
 			e.printStackTrace();
