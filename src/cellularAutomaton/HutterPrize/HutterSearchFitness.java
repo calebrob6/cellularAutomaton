@@ -67,14 +67,14 @@ public class HutterSearchFitness extends FitnessFunction {
 		System.out.println("Calculating fitness...");
 		for(int i=0;i<buffer.length;i++){
 
-			fitness -=  (((buffer[i] & 0X80) == 1) == result.finalBoard.map[i*8]) ? 0 : 1;
-			fitness -=  (((buffer[i] & 0X40) == 1) == result.finalBoard.map[i*8+1]) ? 0 : 1;
-			fitness -=  (((buffer[i] & 0X20) == 1) == result.finalBoard.map[i*8+2]) ? 0 : 1;
-			fitness -=  (((buffer[i] & 0X10) == 1) == result.finalBoard.map[i*8+3]) ? 0 : 1;
-			fitness -=  (((buffer[i] & 0X08) == 1) == result.finalBoard.map[i*8+4]) ? 0 : 1;
-			fitness -=  (((buffer[i] & 0X04) == 1) == result.finalBoard.map[i*8+5]) ? 0 : 1;
-			fitness -=  (((buffer[i] & 0X02) == 1) == result.finalBoard.map[i*8+6]) ? 0 : 1;
-			fitness -=  (((buffer[i] & 0X01) == 1) == result.finalBoard.map[i*8+7]) ? 0 : 1;
+			fitness -=  (((buffer[i] & 0X80) != 0) == result.finalBoard.map[i*8]) ? 0 : 1;
+			fitness -=  (((buffer[i] & 0X40) != 0) == result.finalBoard.map[i*8+1]) ? 0 : 1;
+			fitness -=  (((buffer[i] & 0X20) != 0) == result.finalBoard.map[i*8+2]) ? 0 : 1;
+			fitness -=  (((buffer[i] & 0X10) != 0) == result.finalBoard.map[i*8+3]) ? 0 : 1;
+			fitness -=  (((buffer[i] & 0X08) != 0) == result.finalBoard.map[i*8+4]) ? 0 : 1;
+			fitness -=  (((buffer[i] & 0X04) != 0) == result.finalBoard.map[i*8+5]) ? 0 : 1;
+			fitness -=  (((buffer[i] & 0X02) != 0) == result.finalBoard.map[i*8+6]) ? 0 : 1;
+			fitness -=  (((buffer[i] & 0X01) != 0) == result.finalBoard.map[i*8+7]) ? 0 : 1;
 			
 		}
 

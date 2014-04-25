@@ -58,10 +58,7 @@ public class MargolusSimulation {
 		
 		long start = System.currentTimeMillis();
 
-		while (currentFrame < numIterations) {
-			if(currentFrame%1==0){
-				System.out.println(currentFrame+"/"+numIterations);
-			}
+		while (currentFrame < numIterations && !cycleFound) {
 			long startTime = System.currentTimeMillis();
 			
 			if (hashing) {
@@ -108,7 +105,6 @@ public class MargolusSimulation {
 			}
 			long end1 = System.currentTimeMillis();
 			long diff1 = end1 - start1;
-			System.out.println(diff1);
 
 			currentOffset = (currentOffset == 0) ? 1 : 0;
 

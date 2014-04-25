@@ -1,4 +1,4 @@
-package cellularAutomaton.GATesting;
+package cellularAutomaton.GASmallTesting;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -19,16 +19,17 @@ import org.jgap.impl.IntegerGene;
 import cellularAutomaton.HutterPrize.HutterSearch;
 import cellularAutomaton.HutterPrize.HutterSearchFitness;
 
-public class GATest {
+public class GASmallTest {
 
 	public static void main(String[] args) {
 
 		try {
 			
-			if(args.length<1){
-				System.out.println("Usage:./program initialRandomPercent");
+			if(args.length<3){
+				System.out.println("Usage:./program width height initialRandomPercent");
 				return;
 			}
+			int width = Integer.parseInt(args[0]);
 			double initialRandomPercent = Double.parseDouble(args[0]);
 			runExperiment(true, initialRandomPercent);
 		} catch (Exception e) {
@@ -48,7 +49,7 @@ public class GATest {
 		Configuration conf = new DefaultConfiguration();
 		conf.setPreservFittestIndividual(true);
 		conf.setKeepPopulationSizeConstant(false);
-		FitnessFunction myFunc = new GAFitness(initialRandomPercent);
+		FitnessFunction myFunc = new GASmallFitness(initialRandomPercent);
 		conf.setFitnessFunction(myFunc);
 		if (a_doMonitor) {
 			m_monitor = new EvolutionMonitor();
